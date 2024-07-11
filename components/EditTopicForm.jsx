@@ -1,19 +1,51 @@
-import React from "react";
+"use client";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
-const EditTopicForm = () => {
+const EditTopicForm = ({ id, title, description }) => {
+  const [newTitle, setNewTitle] = useState(title);
+  const [newDescription, setNewDescription] = useState(description);
+
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(e)
+    try {
+      const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ newTitle, newDescription }),
+      });
+      if (res.ok) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.log("Error loading", error);
+    }
+  };
+
+  // const { topics } = await getTopics();
+
   return (
     <form className="flex flex-col gap-3" action="">
       <input
+        onChange={(e) => setNewTitle(e.target.value)}
+        value={newTitle}
         className="border border-slate-500 rounded-md px-8 py-2"
         type="text"
         placeholder="Topic Titile"
       />
       <input
+        onChange={(e) => setNewDescription(e.target.value)}
+        value={newDescription}
         className="border border-slate-500 rounded-md px-8 py-2"
         type="text"
         placeholder="Topic Description"
       />
-      <button className="bg-green-500 rounded-md font-bold text-white py-3 px-8 w-fit">
+      <button onClick={handleSubmit} className="bg-green-500 rounded-md font-bold text-white py-3 px-8 w-fit">
         Update Topic
       </button>
     </form>
